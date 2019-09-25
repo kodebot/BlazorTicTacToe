@@ -1,0 +1,60 @@
+
+@using TicTacToe.Core
+@using TicTacToe.Core.Extensions
+
+<style>
+    .status-overlay{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 280px;
+        height: 200px;
+        background-color: indianred;
+        opacity: 0.99;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .status-overlay-buttons{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+</style>
+
+@if(Status.IsNew() || Status.IsGameOver()){
+    <div class="status-overlay">
+        <div class="status-overlay-buttons">
+            @if(Status.IsNew()){
+                <button class="btn btn-success btn-lg" @onclick="Start">Start <span class="oi oi-chevron-right"></span></button>
+            }
+
+            @if(Status.IsGameOver()){
+                <button class="btn btn-primary btn-lg" @onclick="Restart" style="width: 160px"> <span class="oi oi-loop-circular"></span> Play again</button>
+            }
+        </div>
+    </div>
+}
+
+@code{
+    [Parameter]
+    public GameStatus Status {get; set;}
+
+    [Parameter]
+    public EventCallback OnStart {get; set;}
+
+    [Parameter]
+    public EventCallback OnRestart {get; set;}
+
+    private void Start()
+    {
+        OnStart.InvokeAsync(null);
+    }
+
+    private void Restart()
+    {
+        OnRestart.InvokeAsync(null);
+    }
+}

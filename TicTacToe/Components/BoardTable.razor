@@ -1,0 +1,30 @@
+@using TicTacToe.Core
+
+<table>
+    @foreach (var row in Board.Rows)
+    {
+    <tr>
+        @foreach (var cell in row)
+        {
+            <td>
+                <Cell Data="cell" OnCellSelected="CellSelected">
+                </Cell>
+            </td>
+        }
+    </tr>    
+    }
+</table>
+
+@code{
+
+    [Parameter]
+    public Board<CellMarker> Board {get; set;}
+
+    [Parameter]
+    public EventCallback<Coordinates> OnCellSelected {get; set;}
+
+    private void CellSelected(Coordinates coords)
+    {
+        OnCellSelected.InvokeAsync(coords);
+    }
+}

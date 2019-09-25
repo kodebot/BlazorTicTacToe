@@ -1,0 +1,57 @@
+@using TicTacToe.Core
+
+<style>
+    .stats-card{
+        margin: 5px auto;
+        text-transform: uppercase;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        font-weight: bold;
+    }
+
+    .in-progress{
+        background-color: peru !important;
+    }
+
+    .you-won{
+        background-color: mediumseagreen !important;
+    }
+
+    .you-lost{
+        background-color: indianred !important;
+    }
+</style>
+
+
+<div class="card bg-secondary text-center stats-card">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item bg-secondary text-white"> You: X </li>
+        <li class="list-group-item bg-secondary text-white">Computer: O</li>
+        <li class="list-group-item bg-secondary text-white @GetStatusCssClass()"> 
+            <div>  
+                @(Status switch
+                {
+                    GameStatus.Player1Won => "You won!",
+                    GameStatus.Player2Won => "You lost :(",
+                    GameStatus.Player1Turn => "You turn",
+                    GameStatus.Player2Turn => "Computer's turn",
+                    GameStatus.Tie => "Game Tied",
+                    _ => "New"
+                })
+            </div>
+        </li>
+    </ul>
+</div>
+
+@code{
+    [Parameter]
+    public GameStatus Status {get; set;}
+
+    private string GetStatusCssClass()
+    {
+      return Status switch{
+          GameStatus.Player1Won => "you-won",
+          GameStatus.Player2Won => "you-lost",
+          _ => "in-progress"
+      };
+    }
+}
