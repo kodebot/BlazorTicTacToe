@@ -1,22 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 
 namespace Tictactoe.Core.Player
 {
     public class LocalUserPlayer : IPlayer
     {
-        private readonly Action<int, int> _userMoveRecorder;
+        private readonly Subject<Coordinates> _userMoveRecorder;
 
-
-        public LocalUserPlayer(Action<int, int> userMoveRecorder)
+        public LocalUserPlayer(Subject<Coordinates> userMoveRecorder)
         {
             _userMoveRecorder = userMoveRecorder;
         }
         
-        public async Task<Coordinates> GetNextMove<T>(Board<T> board, T playerMarker)
+        public Task<Coordinates> GetNextMove<T>(Board<T> board, T playerMarker)
         {
-            
+            _userMoveRecorder.AsQbservable().
         }
     }
 }
