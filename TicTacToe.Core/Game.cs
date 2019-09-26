@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TicTacToe.Core.Extensions;
-using TicTacToe.Core.PlayerBot;
+using Tictactoe.Core.Extensions;
+using Tictactoe.Core.PlayerBot;
 
-namespace TicTacToe.Core
+namespace Tictactoe.Core
 {
     public class Game
     {

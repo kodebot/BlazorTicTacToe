@@ -1,4 +1,4 @@
-namespace TicTacToe.Core.PlayerBot
+namespace Tictactoe.Core.PlayerBot
 {
     public interface IPlayerBot
     {

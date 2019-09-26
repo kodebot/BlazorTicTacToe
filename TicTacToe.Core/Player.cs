@@ -1,4 +1,4 @@
-namespace TicTacToe.Core
+namespace Tictactoe.Core
 {
     public enum Player
     {

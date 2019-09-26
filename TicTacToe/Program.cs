@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Blazor.Hosting;
 
-namespace TicTacToe
+namespace Tictactoe
 {
     public class Program
     {

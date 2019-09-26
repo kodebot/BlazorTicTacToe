@@ -1,6 +1,6 @@
 using System;
 
-namespace TicTacToe.Core
+namespace Tictactoe.Core
 {
 
     public class Board<T>

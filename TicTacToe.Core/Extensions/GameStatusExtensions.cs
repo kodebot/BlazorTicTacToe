@@ -1,6 +1,6 @@
 using System.Linq;
 
-namespace TicTacToe.Core.Extensions
+namespace Tictactoe.Core.Extensions
 {
     public static class GameStatusExtensions
     {

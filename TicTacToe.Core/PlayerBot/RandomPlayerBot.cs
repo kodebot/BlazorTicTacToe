@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace TicTacToe.Core.PlayerBot
+namespace Tictactoe.Core.PlayerBot
 {
     public class RandomPlayerBot : IPlayerBot
     {
