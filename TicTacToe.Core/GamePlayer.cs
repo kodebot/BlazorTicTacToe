@@ -1,6 +1,6 @@
 namespace Tictactoe.Core
 {
-    public enum Player
+    public enum GamePlayer
     {
         Player1,
         Player2

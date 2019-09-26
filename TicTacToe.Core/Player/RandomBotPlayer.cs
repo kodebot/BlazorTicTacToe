@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Tictactoe.Core.PlayerBot
+namespace Tictactoe.Core.Player
 {
-    public class RandomPlayerBot : IPlayerBot
+    public class RandomBotPlayer : IPlayer
     {
-        public Coordinates GetNextMove<T>(Board<T> board, T playerMarker)
+        public async Task<Coordinates> GetNextMove<T>(Board<T> board, T playerMarker)
         {
+            await Task.Delay(2000);
             // find random empty cell
             var random = new Random();
             while (true)
