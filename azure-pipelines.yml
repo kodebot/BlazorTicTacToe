@@ -18,5 +18,7 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    projects: 'TicTacToe/bin/Debug/netstandard2.0/publish/'
+    projects: 'TicTacToe'
+    zipAfterPublish: false
+    modifyOutputPath: false
     workingDirectory: 'TicTacToe'
