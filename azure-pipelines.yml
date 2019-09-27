@@ -22,3 +22,8 @@ steps:
     zipAfterPublish: false
     modifyOutputPath: false
     workingDirectory: 'TicTacToe'
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+    artifactName: 'BlazorTictactoe'
