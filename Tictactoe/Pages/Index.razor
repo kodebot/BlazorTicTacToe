@@ -22,15 +22,15 @@
 </style>
 
 <div class="game-container">
-    <StatusCard Status="_game.Status" />
+    <StatusCard Status="_gameEngine.Status" />
     <div>
         <div class="text-right p-2 @HideRestartCssClass()">
             <button class="btn btn-outline-danger btn-sm" @onclick="OnRestart"> <span class="oi oi-loop-circular"></span> Restart</button>
         </div>
        
         <div class="board">
-            <BoardTable Board="_game.Board" OnCellSelected="CellSelected"></BoardTable>
-            <StatusOverlay Status="_game.Status" OnRestart="OnRestart" OnStart="OnStart"></StatusOverlay>
+            <BoardTable Board="_gameEngine.Board" OnCellSelected="CellSelected"></BoardTable>
+            <StatusOverlay Status="_gameEngine.Status" OnRestart="OnRestart" OnStart="OnStart"></StatusOverlay>
         </div>
     </div>
 
@@ -44,10 +44,15 @@
 </div>
 @code {
 
-    GameEngine _game = NewGame();
-    static UserMoveStream _userMovePublisher;
+    private GameEngine _gameEngine;
+    private UserMoveStream _userMovePublisher;
 
-    private static GameEngine NewGame()
+    protected override void OnInitialized()
+    {
+        _gameEngine = NewGame();
+    }
+
+    private GameEngine NewGame()
     {
         _userMovePublisher = new UserMoveStream();
         IPlayer player1 = new LocalUserPlayer(_userMovePublisher);
@@ -58,27 +63,25 @@
 
   private void OnRestart()
   {
-      _game = NewGame();
+      _gameEngine = NewGame();
       OnStart();
   }
 
   private void OnStart()
   {
-      _game.GameStatusChanged += (status) => StateHasChanged();
-      _game.Start();
+      // todo: check if this causes memory leak
+      _gameEngine.GameStatusChanged += (status) => StateHasChanged();
+      _gameEngine.Start();
   }
 
   private void CellSelected(Coordinates coords)
   {
-      // ignore any selection when it is not Player1's turn
-      if (_game.Status == GameStatus.Player1Turn){
-          _userMovePublisher.Publish(coords);
-      }
+      _userMovePublisher.Publish(coords);
   }
 
   private string HideRestartCssClass()
   {
-      if(!_game.Status.IsInProgress())
+      if(!_gameEngine.Status.IsInProgress())
       {
           return "hide";
       }
