@@ -3,25 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Tictactoe.Core.Extensions;
-using Tictactoe.Core.PlayerBot;
+using Tictactoe.Core.Player;
 
 namespace Tictactoe.Core
 {
-    public class Game
+    public class GameEngine
     {
         private readonly Board<CellMarker> _board;
         private GameStatus _status;
-        private readonly Dictionary<Player, CellMarker> _playerMarker;
-        private readonly IPlayerBot _player2;
+        private readonly Dictionary<GamePlayer, CellMarker> _playerMarker;
+        private readonly IPlayer _player1;
+        private readonly IPlayer _player2;
 
-        public Game(IPlayerBot player2)
+        public event Action<GameStatus> GameStatusChanged;
+
+        public GameEngine(IPlayer player1, IPlayer player2)
         {
+            _player1 = player1;
             _player2 = player2;
             _board = new Board<CellMarker>();
-            _playerMarker = new Dictionary<Player, CellMarker>
+
+            // todo: allow user to pick their option
+            _playerMarker = new Dictionary<GamePlayer, CellMarker>
             {
-                [Player.Player1] = CellMarker.Cross,
-                [Player.Player2] = CellMarker.Nought
+                [GamePlayer.Player1] = CellMarker.Cross,
+                [GamePlayer.Player2] = CellMarker.Nought
             };
         }
 
@@ -33,57 +39,70 @@ namespace Tictactoe.Core
             if (_status == GameStatus.New)
             {
                 _status = GameStatus.Player1Turn;
+                Run();
                 return;
             }
 
             throw new InvalidOperationException("Cannot start a game that have already been started");
         }
-        public async Task Play(int row, int col)
+
+        private async void Run()
         {
-            if (_status.IsGameOver())
+            while (_status.IsInProgress())
             {
-                return;
-            }
+                var currentPlayer = GetCurrentPlayer();
+                if (currentPlayer == null)
+                {
+                    throw new InvalidOperationException(
+                        "Something is wrong, current player cannot be null at this point!");
+                }
 
-            _board.Fill(new Coordinates(row, col), GetCellMarkerOfCurrentPlayer());
-            RecalculateGameStatus();
-
-            // if new turn is computers then play computer's turn
-            if (_status == GameStatus.Player2Turn)
-            {
-                await PlayPlayer2Turn(); // todo: move this to event based
+                var coords = await currentPlayer.GetNextMove(_board, GetCellMarkerOfCurrentPlayer());
+                _board.Fill(coords, GetCellMarkerOfCurrentPlayer());
+                RecalculateGameStatus();
             }
         }
 
-        private async Task PlayPlayer2Turn()
+        private IPlayer GetCurrentPlayer()
         {
-            await Task.Delay(2000);
-            var coords = _player2.GetNextMove(_board, _playerMarker[Player.Player2]);
-            await Play(coords.X, coords.Y);
+            return _status switch
+            {
+                GameStatus.Player1Turn => _player1,
+                GameStatus.Player2Turn => _player2,
+                _ => null
+            };
         }
 
         private CellMarker GetCellMarkerOfCurrentPlayer()
         {
             return _status switch
             {
-
-                GameStatus.Player1Turn => _playerMarker[Player.Player1],
-                GameStatus.Player2Turn => _playerMarker[Player.Player2],
-                _ => throw new InvalidOperationException("Cannot get the player's option when it is not one of the player's turn")
+                GameStatus.Player1Turn => _playerMarker[GamePlayer.Player1],
+                GameStatus.Player2Turn => _playerMarker[GamePlayer.Player2],
+                _ => throw new InvalidOperationException(
+                    "Cannot get the player's option when it is not one of the player's turn")
             };
         }
 
-        private Player GetPlayerFromCellMarker(CellMarker marker)
+        private GamePlayer GetPlayerFromCellMarker(CellMarker marker)
         {
             return _playerMarker.First(p => p.Value == marker).Key;
         }
 
         private void RecalculateGameStatus()
         {
-            _status = GetGameStatus();
+            var newStatus = GetNewGameStatus();
+
+            if(newStatus != _status){
+                _status = newStatus;
+
+                if(GameStatusChanged != null){
+                    GameStatusChanged(_status);
+                }
+            }
         }
 
-        private GameStatus GetGameStatus()
+        private GameStatus GetNewGameStatus()
         {
             var (hasWinner, winningCells) = GetWinner();
 
@@ -108,8 +127,8 @@ namespace Tictactoe.Core
                 var player = GetPlayerFromCellMarker(row[0].Value);
                 return player switch
                 {
-                    Player.Player1 => GameStatus.Player1Won,
-                    Player.Player2 => GameStatus.Player2Won,
+                    GamePlayer.Player1 => GameStatus.Player1Won,
+                    GamePlayer.Player2 => GameStatus.Player2Won,
                     _ => throw new InvalidOperationException("This is impossible!")
                 };
             }
@@ -121,14 +140,12 @@ namespace Tictactoe.Core
                     GameStatus.Player1Turn => GameStatus.Player2Turn,
                     GameStatus.Player2Turn => GameStatus.Player1Turn,
                     _ => _status // ignore
-
                 };
             }
         }
 
         private (bool, Cell<CellMarker>[]) GetWinner()
         {
-            var hasWinner = false;
             var winningCells = new List<Cell<CellMarker>>();
 
             // horizontals
@@ -136,9 +153,8 @@ namespace Tictactoe.Core
             {
                 if (IsAllMarkedWithSameNonEmptyValue(row))
                 {
-                    hasWinner = true;
                     winningCells = row.ToList();
-                    return (hasWinner, winningCells.ToArray());
+                    return (true, winningCells.ToArray());
                 }
             }
 
@@ -147,29 +163,26 @@ namespace Tictactoe.Core
             {
                 if (IsAllMarkedWithSameNonEmptyValue(col))
                 {
-                    hasWinner = true;
                     winningCells = col.ToList();
-                    return (hasWinner, winningCells.ToArray());
+                    return (true, winningCells.ToArray());
                 }
             }
 
             // diagonal - top left to bottom right
             if (IsAllMarkedWithSameNonEmptyValue(_board.LeftToRightDiagonal))
             {
-                hasWinner = true;
                 winningCells = _board.LeftToRightDiagonal.ToList();
-                return (hasWinner, winningCells.ToArray());
+                return (true, winningCells.ToArray());
             }
 
             // diagonal - top right to bottom left
-            if (IsAllMarkedWithSameNonEmptyValue(_board.RightToLeftDiagonal))
+            if (!IsAllMarkedWithSameNonEmptyValue(_board.RightToLeftDiagonal))
             {
-                hasWinner = true;
-                winningCells = _board.RightToLeftDiagonal.ToList();
-                return (hasWinner, winningCells.ToArray());
+                return (false, winningCells.ToArray()); // no winner
             }
 
-            return (hasWinner, winningCells.ToArray()); // no winner
+            winningCells = _board.RightToLeftDiagonal.ToList();
+            return (true, winningCells.ToArray());
         }
 
         private static bool IsAllMarkedWithSameNonEmptyValue(Cell<CellMarker>[] cells)

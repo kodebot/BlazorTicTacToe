@@ -1,7 +1,7 @@
 ﻿@page "/"
 @using Tictactoe.Core
 @using Tictactoe.Core.Extensions
-@using Tictactoe.Core.PlayerBot
+@using Tictactoe.Core.Player
 
 <style>
     
@@ -22,15 +22,15 @@
 </style>
 
 <div class="game-container">
-    <StatusCard Status="game.Status" />
+    <StatusCard Status="_game.Status" />
     <div>
         <div class="text-right p-2 @HideRestartCssClass()">
             <button class="btn btn-outline-danger btn-sm" @onclick="OnRestart"> <span class="oi oi-loop-circular"></span> Restart</button>
         </div>
        
         <div class="board">
-            <BoardTable Board="game.Board" OnCellSelected="CellSelected"></BoardTable>
-            <StatusOverlay Status="game.Status" OnRestart="OnRestart" OnStart="OnStart"></StatusOverlay>
+            <BoardTable Board="_game.Board" OnCellSelected="CellSelected"></BoardTable>
+            <StatusOverlay Status="_game.Status" OnRestart="OnRestart" OnStart="OnStart"></StatusOverlay>
         </div>
     </div>
 
@@ -43,30 +43,42 @@
     </div>
 </div>
 @code {
-  Game game = new Game(new RandomPlayerBot());
+
+    GameEngine _game = NewGame();
+    static UserMoveStream _userMovePublisher;
+
+    private static GameEngine NewGame()
+    {
+        _userMovePublisher = new UserMoveStream();
+        IPlayer player1 = new LocalUserPlayer(_userMovePublisher);
+        IPlayer player2 = new RandomBotPlayer();
+        var engine  = new GameEngine(player1, player2);
+        return engine;
+    }
 
   private void OnRestart()
   {
-      game = new Game(new RandomPlayerBot());
-      game.Start();
+      _game = NewGame();
+      OnStart();
   }
 
   private void OnStart()
   {
-      game.Start();
+      _game.GameStatusChanged += (status) => StateHasChanged();
+      _game.Start();
   }
 
-  private async Task CellSelected(Coordinates coords)
+  private void CellSelected(Coordinates coords)
   {
       // ignore any selection when it is not Player1's turn
-      if (game.Status == GameStatus.Player1Turn){
-          await game.Play(coords.X, coords.Y);
+      if (_game.Status == GameStatus.Player1Turn){
+          _userMovePublisher.Publish(coords);
       }
   }
 
   private string HideRestartCssClass()
   {
-      if(!game.Status.IsInProgress())
+      if(!_game.Status.IsInProgress())
       {
           return "hide";
       }
