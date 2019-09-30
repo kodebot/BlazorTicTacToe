@@ -1,17 +1,32 @@
-﻿@page "/settings"
+﻿@using Tictactoe.Model
+@inject Model.Settings GameSettings
+@page "/settings"
 
 <h1>Settings</h1>
 
 <div class="card" style="width: 18rem;">
-  <div class="card-header bg-success text-light">
+  <div class="card-header bg-primary text-light">
     Computer Player Mode
   </div>
     <div class="card-body text-center">
         <div class="btn-group" role="group" aria-label="Basic example">
-            <button type="button" class="btn btn-success">Random</button>
-            <button type="button" class="btn btn-secondary">Smart</button>
-            <button type="button" class="btn btn-secondary" disabled>AI</button>
+            <button type="button" class="btn @GetCurrentComputerPlayerModeCssClass(ComputerPlayerMode.Random)" @onclick="() => SaveComputerPlayerMode(ComputerPlayerMode.Random)" >Random</button>
+            <button type="button" class="btn @GetCurrentComputerPlayerModeCssClass(ComputerPlayerMode.Smart)" @onclick="() => SaveComputerPlayerMode(ComputerPlayerMode.Smart)">Smart</button>
+            <button type="button" class="btn @GetCurrentComputerPlayerModeCssClass(ComputerPlayerMode.AI)" disabled @onclick="() => SaveComputerPlayerMode(ComputerPlayerMode.AI)">AI</button>
         </div>
    </div>
 </div>
+
+@code{
+
+    private void SaveComputerPlayerMode(ComputerPlayerMode mode)
+    {
+        GameSettings.ComputerPlayerMode = mode;
+    }
+
+    public string GetCurrentComputerPlayerModeCssClass(ComputerPlayerMode mode)
+    {
+        return mode == GameSettings.ComputerPlayerMode ? "btn-success" : "btn-secondary";
+    }
+}
 

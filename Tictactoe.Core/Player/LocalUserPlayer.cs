@@ -10,19 +10,11 @@ namespace Tictactoe.Core.Player
         private Action<Coordinates> _subscriberCallback;
         public void Publish(Coordinates coords)
         {
-            System.Console.WriteLine("new publish");;
-            if (_subscriberCallback != null)
-            {
-                System.Console.WriteLine("passing to subscriber");
-                _subscriberCallback(coords);
-            }else{
-                System.Console.WriteLine("no subscriber");
-            }
+            _subscriberCallback?.Invoke(coords);
         }
 
         public void Subscribe(Action<Coordinates> callback)
         {
-            Console.WriteLine("Subscription added");
             _subscriberCallback = callback;
         }
     }
@@ -38,9 +30,7 @@ namespace Tictactoe.Core.Player
         public Task<Coordinates> GetNextMove<T>(Board<T> board, T playerMarker)
         {
             var taskSource = new TaskCompletionSource<Coordinates>();
-            _userMoveStream.Subscribe(val => {
-                Console.WriteLine("here1");
-                taskSource.SetResult(val);});
+            _userMoveStream.Subscribe(val => taskSource.SetResult(val));
             return taskSource.Task;
         }
     }
