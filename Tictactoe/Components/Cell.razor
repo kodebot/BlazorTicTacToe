@@ -1,4 +1,4 @@
-@using TicTacToe.Core;
+@using Tictactoe.Core;
 
 <style>
     .cell{
@@ -17,9 +17,17 @@
         margin: auto;
         text-align:  center;
     }
+    
+    .cell.winner{
+        background-color: #1c7430;
+    }
+    
+    .cell.loser{
+        background-color: #c82333;
+    }
 </style>
 
-<div @onclick="CellSelected" class="cell">
+<div @onclick="CellSelected" class="cell @GetWinnerCssClass()">
     <span>
        @(Data.Value switch
         {
@@ -31,14 +39,29 @@
 </div>
 
 @code {
-  
   [Parameter]
   public Cell<CellMarker> Data {get; set;}
+    
+  [Parameter]
+  public bool IsWinner { get; set; }
+    
+  [Parameter]
+  public GameStatus Status { get; set; }
 
   [Parameter]
   public EventCallback<Coordinates> OnCellSelected {get; set;}
 
   private void CellSelected(){
       OnCellSelected.InvokeAsync(Data.Coordinates);
+  }
+
+  private string GetWinnerCssClass()
+  {
+      return IsWinner switch
+      {
+          true when Status == GameStatus.Player1Won => "winner",
+          true when Status == GameStatus.Player2Won => "loser",
+          _ => ""
+      };
   }
 }

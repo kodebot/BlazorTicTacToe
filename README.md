@@ -1,3 +1,3 @@
 ## run
-`cd TicTacToe`
+`cd Tictactoe`
 `dotnet watch run`

@@ -1,6 +1,6 @@
 using System;
 
-namespace TicTacToe.Core
+namespace Tictactoe.Core
 {
 
     public class Board<T>
@@ -15,13 +15,7 @@ namespace TicTacToe.Core
             InitCells();
         }
 
-        public T this[int row, int col]
-        {
-            get
-            {
-                return _cells[row][col].Value;
-            }
-        }
+        public T this[int row, int col] => _cells[row][col].Value;
 
         public int GridSize => _gridSize;
 
