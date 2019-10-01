@@ -11,6 +11,7 @@ namespace Tictactoe.Core
     {
         private readonly Board<CellMarker> _board;
         private GameStatus _status;
+        private Coordinates[] _winningCoordinates;
         private readonly Player<CellMarker> _player1;
         private readonly Player<CellMarker> _player2;
 
@@ -26,6 +27,8 @@ namespace Tictactoe.Core
         public GameStatus Status => _status;
 
         public Board<CellMarker> Board => _board;
+
+        public Coordinates[] WinningCoordinates => _winningCoordinates;
 
         public void Start()
         {
@@ -83,6 +86,7 @@ namespace Tictactoe.Core
 
             if (hasWinner)
             {
+                _winningCoordinates = winningCells.Select(cell => cell.Coordinates).ToArray();
                 return GetWinnerGameStatus(winningCells.ToArray());
             }
 

@@ -7,7 +7,7 @@
         @foreach (var cell in row)
         {
             <td>
-                <Cell Data="cell" OnCellSelected="CellSelected">
+                <Cell Data="cell" IsWinner="IsWinningCoordinate(cell)" Status="Status"  OnCellSelected="CellSelected">
                 </Cell>
             </td>
         }
@@ -19,10 +19,21 @@
 
     [Parameter]
     public Board<CellMarker> Board {get; set;}
+    
+    [Parameter]
+    public Coordinates[] WinningCoordinates { get; set; }
+    
+    [Parameter]
+    public GameStatus Status { get; set; }
 
     [Parameter]
     public EventCallback<Coordinates> OnCellSelected {get; set;}
 
+    private bool IsWinningCoordinate(Cell<CellMarker> cell)
+    {
+        return WinningCoordinates != null && WinningCoordinates.Contains(cell.Coordinates);
+    }
+    
     private void CellSelected(Coordinates coords)
     {
         OnCellSelected.InvokeAsync(coords);

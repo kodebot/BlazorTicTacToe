@@ -32,7 +32,7 @@
         </div>
        
         <div class="board">
-            <BoardTable Board="_gameEngine.Board" OnCellSelected="CellSelected"></BoardTable>
+            <BoardTable Board="_gameEngine.Board"  WinningCoordinates ="_gameEngine.WinningCoordinates" Status="_gameEngine.Status" OnCellSelected="CellSelected"></BoardTable>
             <StatusOverlay Status="_gameEngine.Status" OnRestart="OnRestart" OnStart="OnStart"></StatusOverlay>
         </div>
     </div>
