@@ -2,8 +2,8 @@ namespace Tictactoe.Model
 {
     public enum ComputerPlayerMode
     {
-        Random,
         Smart,
+        Random,
         AI
     }
 }

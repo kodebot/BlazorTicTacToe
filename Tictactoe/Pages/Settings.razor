@@ -10,9 +10,9 @@
   </div>
     <div class="card-body text-center">
         <div class="btn-group" role="group" aria-label="Basic example">
-            <button type="button" class="btn @GetCurrentComputerPlayerModeCssClass(ComputerPlayerMode.Random)" @onclick="() => SaveComputerPlayerMode(ComputerPlayerMode.Random)" >Random</button>
-            <button type="button" class="btn @GetCurrentComputerPlayerModeCssClass(ComputerPlayerMode.Smart)" @onclick="() => SaveComputerPlayerMode(ComputerPlayerMode.Smart)">Smart</button>
-            <button type="button" class="btn @GetCurrentComputerPlayerModeCssClass(ComputerPlayerMode.AI)" disabled @onclick="() => SaveComputerPlayerMode(ComputerPlayerMode.AI)">AI</button>
+            <button type="button" class="btn @GetCurrentComputerPlayerModeCssClass(ComputerPlayerMode.Random)" @onclick="() => SaveComputerPlayerMode(ComputerPlayerMode.Random)" >@ComputerPlayerMode.Random.ToString()</button>
+            <button type="button" class="btn @GetCurrentComputerPlayerModeCssClass(ComputerPlayerMode.Smart)" @onclick="() => SaveComputerPlayerMode(ComputerPlayerMode.Smart)">@ComputerPlayerMode.Smart.ToString()</button>
+            <button type="button" class="btn @GetCurrentComputerPlayerModeCssClass(ComputerPlayerMode.AI)" disabled @onclick="() => SaveComputerPlayerMode(ComputerPlayerMode.AI)">@ComputerPlayerMode.AI.ToString()</button>
         </div>
    </div>
 </div>

@@ -2,6 +2,9 @@
 @using Tictactoe.Core
 @using Tictactoe.Core.Extensions
 @using Tictactoe.Core.Player
+@using Tictactoe.Model
+
+@inject Model.Settings GameSettings
 
 <style>
     
@@ -55,8 +58,8 @@
     private GameEngine NewGame()
     {
         _userMovePublisher = new UserMoveStream();
-        Player<CellMarker> player1 = new LocalUserPlayer(_userMovePublisher, CellMarker.Cross);
-        Player<CellMarker> player2 = new SmartBotPlayer(CellMarker.Nought);
+        var player1 = new LocalUserPlayer(_userMovePublisher, CellMarker.Cross);
+        var player2 = GetPlayer2(GameSettings.ComputerPlayerMode, CellMarker.Nought);
         var engine  = new GameEngine(player1, player2);
         return engine;
     }
@@ -88,4 +91,14 @@
 
       return String.Empty;
   }
+
+    private Player<CellMarker> GetPlayer2(ComputerPlayerMode playerMode, CellMarker marker)
+    {
+        return playerMode switch
+        {
+            ComputerPlayerMode.Random => new RandomBotPlayer(marker) as Player<CellMarker>,
+            ComputerPlayerMode.Smart => new SmartBotPlayer(marker),
+            _ => throw new NotSupportedException($"Player mode {playerMode} is not supported")
+        };
+    }
 }
