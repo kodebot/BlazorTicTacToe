@@ -4,9 +4,16 @@ using System.Threading.Tasks;
 
 namespace Tictactoe.Core.Player
 {
-    public class RandomBotPlayer : IPlayer
+    public class RandomBotPlayer : Player<CellMarker>
     {
-        public async Task<Coordinates> GetNextMove<T>(Board<T> board, T playerMarker)
+        public RandomBotPlayer(
+            Board<CellMarker> board,
+            CellMarker playerMarker,
+            CellMarker opponentPlayerMarker) : base(board, playerMarker, opponentPlayerMarker)
+        {
+        }
+
+        public override async Task<Coordinates> GetNextMove()
         {
             await Task.Delay(2000);
             // find random empty cell
@@ -15,7 +22,7 @@ namespace Tictactoe.Core.Player
             {
                 var row = random.Next(0, 3);
                 var col = random.Next(0, 3);
-                if (EqualityComparer<T>.Default.Equals( board[row, col],default(T)))
+                if (Board[row, col] == CellMarker.Empty)
                 {
                     return new Coordinates(row, col);
                 }

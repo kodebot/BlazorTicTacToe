@@ -8,6 +8,7 @@ namespace Tictactoe.Core.Player
     public class UserMoveStream
     {
         private Action<Coordinates> _subscriberCallback;
+
         public void Publish(Coordinates coords)
         {
             _subscriberCallback?.Invoke(coords);
@@ -18,16 +19,21 @@ namespace Tictactoe.Core.Player
             _subscriberCallback = callback;
         }
     }
-    public class LocalUserPlayer : IPlayer
+
+    public class LocalUserPlayer : Player<CellMarker>
     {
         private readonly UserMoveStream _userMoveStream;
 
-        public LocalUserPlayer(UserMoveStream userMoveStream)
+        public LocalUserPlayer(
+            UserMoveStream userMoveStream,
+            Board<CellMarker> board,
+            CellMarker playerMarker,
+            CellMarker opponentPlayerMarker) : base(board, playerMarker, opponentPlayerMarker)
         {
             _userMoveStream = userMoveStream;
         }
 
-        public Task<Coordinates> GetNextMove<T>(Board<T> board, T playerMarker)
+        public override Task<Coordinates> GetNextMove()
         {
             var taskSource = new TaskCompletionSource<Coordinates>();
             _userMoveStream.Subscribe(val => taskSource.SetResult(val));

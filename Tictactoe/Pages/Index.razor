@@ -54,10 +54,11 @@
 
     private GameEngine NewGame()
     {
+        var board = new Board<CellMarker>();
         _userMovePublisher = new UserMoveStream();
-        IPlayer player1 = new LocalUserPlayer(_userMovePublisher);
-        IPlayer player2 = new RandomBotPlayer();
-        var engine  = new GameEngine(player1, player2);
+        Player<CellMarker> player1 = new LocalUserPlayer(_userMovePublisher, board, CellMarker.Nought, CellMarker.Cross);
+        Player<CellMarker> player2 = new SmartBotPlayer(board, CellMarker.Cross, CellMarker.Nought);
+        var engine  = new GameEngine(board, player1, player2);
         return engine;
     }
 

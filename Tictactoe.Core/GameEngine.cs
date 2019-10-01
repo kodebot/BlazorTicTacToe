@@ -11,24 +11,16 @@ namespace Tictactoe.Core
     {
         private readonly Board<CellMarker> _board;
         private GameStatus _status;
-        private readonly Dictionary<GamePlayer, CellMarker> _playerMarker;
-        private readonly IPlayer _player1;
-        private readonly IPlayer _player2;
+        private readonly Player<CellMarker> _player1;
+        private readonly Player<CellMarker> _player2;
 
         public event Action<GameStatus> GameStatusChanged;
 
-        public GameEngine(IPlayer player1, IPlayer player2)
+        public GameEngine(Board<CellMarker> board, Player<CellMarker> player1, Player<CellMarker> player2)
         {
             _player1 = player1;
             _player2 = player2;
-            _board = new Board<CellMarker>();
-
-            // todo: allow user to pick their option
-            _playerMarker = new Dictionary<GamePlayer, CellMarker>
-            {
-                [GamePlayer.Player1] = CellMarker.Cross,
-                [GamePlayer.Player2] = CellMarker.Nought
-            };
+            _board = board;
         }
 
         public Board<CellMarker> Board => _board;
@@ -57,13 +49,13 @@ namespace Tictactoe.Core
                         "Something is wrong, current player cannot be null at this point!");
                 }
 
-                var coords = await currentPlayer.GetNextMove(_board, GetCellMarkerOfCurrentPlayer());
-                _board.Fill(coords, GetCellMarkerOfCurrentPlayer());
+                var coords = await currentPlayer.GetNextMove();
+                _board.Fill(coords, currentPlayer.Marker);
                 RecalculateGameStatus();
             }
         }
 
-        private IPlayer GetCurrentPlayer()
+        private Player<CellMarker> GetCurrentPlayer()
         {
             return _status switch
             {
@@ -73,22 +65,6 @@ namespace Tictactoe.Core
             };
         }
 
-        private CellMarker GetCellMarkerOfCurrentPlayer()
-        {
-            return _status switch
-            {
-                GameStatus.Player1Turn => _playerMarker[GamePlayer.Player1],
-                GameStatus.Player2Turn => _playerMarker[GamePlayer.Player2],
-                _ => throw new InvalidOperationException(
-                    "Cannot get the player's option when it is not one of the player's turn")
-            };
-        }
-
-        private GamePlayer GetPlayerFromCellMarker(CellMarker marker)
-        {
-            return _playerMarker.First(p => p.Value == marker).Key;
-        }
-
         private void RecalculateGameStatus()
         {
             var newStatus = GetNewGameStatus();
@@ -96,9 +72,7 @@ namespace Tictactoe.Core
             if(newStatus != _status){
                 _status = newStatus;
 
-                if(GameStatusChanged != null){
-                    GameStatusChanged(_status);
-                }
+                GameStatusChanged?.Invoke(_status);
             }
         }
 
@@ -124,13 +98,17 @@ namespace Tictactoe.Core
 
             GameStatus GetWinnerGameStatus(Cell<CellMarker>[] row)
             {
-                var player = GetPlayerFromCellMarker(row[0].Value);
-                return player switch
+                if (_player1.Marker == row[0].Value)
                 {
-                    GamePlayer.Player1 => GameStatus.Player1Won,
-                    GamePlayer.Player2 => GameStatus.Player2Won,
-                    _ => throw new InvalidOperationException("This is impossible!")
-                };
+                    return GameStatus.Player1Won;
+                }
+                
+                if (_player2.Marker == row[0].Value)
+                {
+                    return GameStatus.Player2Won;
+                }
+
+                throw new InvalidOperationException("This is impossible!");
             }
 
             GameStatus RotateTurn()
