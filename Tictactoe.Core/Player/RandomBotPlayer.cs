@@ -6,14 +6,11 @@ namespace Tictactoe.Core.Player
 {
     public class RandomBotPlayer : Player<CellMarker>
     {
-        public RandomBotPlayer(
-            Board<CellMarker> board,
-            CellMarker playerMarker,
-            CellMarker opponentPlayerMarker) : base(board, playerMarker, opponentPlayerMarker)
+        public RandomBotPlayer(CellMarker marker) : base(marker)
         {
         }
 
-        public override async Task<Coordinates> GetNextMove()
+        public override async Task<Coordinates> GetNextMove(Board<CellMarker> board)
         {
             await Task.Delay(2000);
             // find random empty cell
@@ -22,7 +19,7 @@ namespace Tictactoe.Core.Player
             {
                 var row = random.Next(0, 3);
                 var col = random.Next(0, 3);
-                if (Board[row, col] == CellMarker.Empty)
+                if (board[row, col] == CellMarker.Empty)
                 {
                     return new Coordinates(row, col);
                 }

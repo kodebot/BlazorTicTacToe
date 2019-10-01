@@ -16,15 +16,16 @@ namespace Tictactoe.Core
 
         public event Action<GameStatus> GameStatusChanged;
 
-        public GameEngine(Board<CellMarker> board, Player<CellMarker> player1, Player<CellMarker> player2)
+        public GameEngine(Player<CellMarker> player1, Player<CellMarker> player2)
         {
             _player1 = player1;
             _player2 = player2;
-            _board = board;
+            _board = new Board<CellMarker>();
         }
 
-        public Board<CellMarker> Board => _board;
         public GameStatus Status => _status;
+
+        public Board<CellMarker> Board => _board;
 
         public void Start()
         {
@@ -49,7 +50,7 @@ namespace Tictactoe.Core
                         "Something is wrong, current player cannot be null at this point!");
                 }
 
-                var coords = await currentPlayer.GetNextMove();
+                var coords = await currentPlayer.GetNextMove(_board);
                 _board.Fill(coords, currentPlayer.Marker);
                 RecalculateGameStatus();
             }

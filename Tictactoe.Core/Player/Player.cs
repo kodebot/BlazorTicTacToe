@@ -4,18 +4,13 @@ namespace Tictactoe.Core.Player
 {
     public abstract class Player<T>
     {
-        protected readonly Board<T> Board;
-        protected readonly T PlayerMarker;
-        protected readonly T OpponentPlayerMarker;
-
-        protected Player(Board<T> board, T playerMarker, T opponentPlayerMarker)
+        protected Player(T marker)
         {
-            Board = board;
-            PlayerMarker = playerMarker;
-            OpponentPlayerMarker = opponentPlayerMarker;
+            Marker = marker;
         }
 
-        public T Marker => PlayerMarker;
-        public abstract Task<Coordinates> GetNextMove();
+        public T Marker { get; }
+
+        public abstract Task<Coordinates> GetNextMove(Board<T> board);
     }
 }

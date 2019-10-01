@@ -26,14 +26,12 @@ namespace Tictactoe.Core.Player
 
         public LocalUserPlayer(
             UserMoveStream userMoveStream,
-            Board<CellMarker> board,
-            CellMarker playerMarker,
-            CellMarker opponentPlayerMarker) : base(board, playerMarker, opponentPlayerMarker)
+            CellMarker marker) : base(marker)
         {
             _userMoveStream = userMoveStream;
         }
 
-        public override Task<Coordinates> GetNextMove()
+        public override Task<Coordinates> GetNextMove(Board<CellMarker> board)
         {
             var taskSource = new TaskCompletionSource<Coordinates>();
             _userMoveStream.Subscribe(val => taskSource.SetResult(val));
