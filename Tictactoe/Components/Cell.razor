@@ -28,12 +28,17 @@
 
 <div @onclick="CellSelected" class="cell @GetWinnerCssClass()">
     <span>
-       @(Data.Value switch
+        @if (Data.Value == CellMarker.Cross)
         {
-            CellMarker.Cross => "X",
-            CellMarker.Nought => "O",
-            _ => " "
-        })
+           <CellCross />
+        }else if (Data.Value == CellMarker.Nought)
+        {
+            <CellNought />
+        }
+        else
+        {
+            @: 
+        }
     </span>
 </div>
 
@@ -49,7 +54,7 @@
 
   [Parameter]
   public EventCallback<Coordinates> OnCellSelected {get; set;}
-
+    
   private void CellSelected(){
       OnCellSelected.InvokeAsync(Data.Coordinates);
   }

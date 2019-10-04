@@ -1,0 +1,49 @@
+@using Tictactoe.Core;
+
+<style>
+.cross{
+  height: 50px;
+  width: 50px;
+  background-color: transparent;
+  color: white;
+  position: relative;
+}
+
+.cross > .line{
+  position: absolute;
+  margin: 10px;
+  height: 6px;
+  width: 0;
+  background:white;
+  animation-fill-mode: forwards;
+}
+
+.line-left{
+  transform-origin: left;
+  transform: rotate(45deg) translate(-5px, -2px);
+  animation: small-cross-line-grow .5s;
+}
+
+.line-right{
+  margin-left: 40px !important;
+  transform-origin: left;
+  transform: rotate(135deg) translate(-5px, 2px);
+  animation: small-cross-line-grow .5s .5s;
+}
+
+@@keyframes small-cross-line-grow{
+  from{
+    width: 0;
+  }
+
+  to{
+    width: 48px;
+  }
+}
+    
+</style>
+
+<div class="cross">
+  <div class="line line-left"></div>
+  <div class="line line-right"></div>
+</div>
