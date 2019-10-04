@@ -1,12 +1,12 @@
 @using Tictactoe.Core
 
-<table>
+<table style="background: gray">
     @foreach (var row in Board.Rows)
     {
     <tr>
         @foreach (var cell in row)
         {
-            <td>
+            <td class="@GetCellPaddingCssClass(cell)">
                 <Cell Data="cell" IsWinner="IsWinningCoordinate(cell)" Status="Status"  OnCellSelected="CellSelected">
                 </Cell>
             </td>
@@ -37,5 +37,13 @@
     private void CellSelected(Coordinates coords)
     {
         OnCellSelected.InvokeAsync(coords);
+    }
+
+    private string GetCellPaddingCssClass(Cell<CellMarker> cell)
+    {
+        var styleClass = string.Empty;
+        styleClass = (cell.Coordinates.X + 1) % 3 != 0 ? $"{styleClass} pb-1" : $"{styleClass} pb-0";
+        styleClass = (cell.Coordinates.Y + 1) % 3 != 0 ? $"{styleClass} pr-1" : $"{styleClass} pr-0";
+        return styleClass;
     }
 }
