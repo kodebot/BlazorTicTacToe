@@ -34,7 +34,14 @@ namespace Tictactoe.Core.Player
         public override Task<Coordinates> GetNextMove(Board<CellMarker> board)
         {
             var taskSource = new TaskCompletionSource<Coordinates>();
-            _userMoveStream.Subscribe(val => taskSource.SetResult(val));
+            _userMoveStream.Subscribe(val =>
+            {
+                // ignore if users clicks a cell that is not empty
+                if (board[val.X, val.Y] == CellMarker.Empty)
+                {
+                    taskSource.SetResult(val);    
+                }
+            });
             return taskSource.Task;
         }
     }
