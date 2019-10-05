@@ -2,6 +2,7 @@
 
 <style>
     .stats-card{
+        width: 250px;
         margin: 5px auto;
         text-transform: uppercase;
         font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -24,9 +25,9 @@
 
 <div class="card bg-secondary text-center stats-card">
     <ul class="list-group list-group-flush">
-        <li class="list-group-item bg-secondary text-white"> You: X </li>
-        <li class="list-group-item bg-secondary text-white">Opponent: O</li>
-        <li class="list-group-item bg-secondary text-white @GetStatusCssClass()"> 
+        <li class="list-group-item bg-secondary text-white p-1"> You: X </li>
+        <li class="list-group-item bg-secondary text-white p-1">Opponent: O</li>
+        <li class="list-group-item bg-secondary text-white @GetStatusCssClass() p-1"> 
             <div>  
                 @(Status switch
                 {

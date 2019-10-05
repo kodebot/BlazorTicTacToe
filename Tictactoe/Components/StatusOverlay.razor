@@ -7,7 +7,7 @@
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -50%);
+        transform: translate(-50%, -58%);
         width: 280px;
         height: 200px;
         background-color: transparent;
@@ -24,16 +24,10 @@
     }
 </style>
 
-@if(Status.IsNew() || Status.IsGameOver()){
+@if(Status.IsGameOver()){
     <div class="status-overlay">
         <div class="status-overlay-buttons">
-            @if(Status.IsNew()){
-                <button class="btn btn-success btn-lg" @onclick="Start">Start <span class="oi oi-chevron-right"></span></button>
-            }
-
-            @if(Status.IsGameOver()){
-                <button class="btn btn-primary btn-lg" @onclick="Restart" style="width: 160px"> <span class="oi oi-loop-circular"></span> Play again</button>
-            }
+           <button class="btn btn-primary btn-lg" @onclick="Restart" style="width: 160px"> <span class="oi oi-loop-circular"></span> Play again</button>
         </div>
     </div>
 }
@@ -43,16 +37,8 @@
     public GameStatus Status {get; set;}
 
     [Parameter]
-    public EventCallback OnStart {get; set;}
-
-    [Parameter]
     public EventCallback OnRestart {get; set;}
-
-    private void Start()
-    {
-        OnStart.InvokeAsync(null);
-    }
-
+    
     private void Restart()
     {
         OnRestart.InvokeAsync(null);

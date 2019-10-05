@@ -9,32 +9,34 @@
 <style>
     
     .game-container{
-        width:300px;
         margin:0 auto;
     }
 
-    .board{
+    .status{
         position: relative;
-        width:306px;
     }
 
     .hide{
         visibility:hidden;
     }
+    
+    .command-bar{
+        width: 250px;
+        margin: 0 auto;
+    }
 
 </style>
 
 <div class="game-container">
+<div class="status">
     <StatusCard Status="_gameEngine.Status" />
+    <StatusOverlay Status="_gameEngine.Status" OnRestart="OnRestart" ></StatusOverlay>
+</div>
     <div>
-        <div class="text-right p-2 @HideRestartCssClass()">
+        <div class="text-right p-2 @HideRestartCssClass() command-bar">
             <button class="btn btn-outline-danger btn-sm" @onclick="OnRestart"> <span class="oi oi-loop-circular"></span> Restart</button>
         </div>
-       
-        <div class="board">
             <BoardTable Board="_gameEngine.Board"  WinningCoordinates ="_gameEngine.WinningCoordinates" Status="_gameEngine.Status" OnCellSelected="CellSelected"></BoardTable>
-            <StatusOverlay Status="_gameEngine.Status" OnRestart="OnRestart" OnStart="OnStart"></StatusOverlay>
-        </div>
     </div>
 
     <div class="hide">
@@ -53,6 +55,7 @@
     protected override void OnInitialized()
     {
         _gameEngine = NewGame();
+        Start();
     }
 
     private GameEngine NewGame()
@@ -67,10 +70,10 @@
   private void OnRestart()
   {
       _gameEngine = NewGame();
-      OnStart();
+      Start();
   }
 
-  private void OnStart()
+  private void Start()
   {
       // todo: check if this causes memory leak
       _gameEngine.GameStatusChanged += (status) => StateHasChanged();
