@@ -3,10 +3,9 @@
 <style>
     .cell{
         display: flex; 
-        width: 100px; 
-        height: 100px;
+        width: 80px; 
+        height: 80px;
         margin: auto; 
-        border-radius: 10px; 
         background-color:darkslateblue;
         font-weight: bold;
         font-size: 2em;
@@ -19,22 +18,27 @@
     }
     
     .cell.winner{
-        background-color: #1c7430;
+        background-color: mediumseagreen;
     }
     
     .cell.loser{
-        background-color: #c82333;
+        background-color: indianred;
     }
 </style>
 
 <div @onclick="CellSelected" class="cell @GetWinnerCssClass()">
     <span>
-       @(Data.Value switch
+        @if (Data.Value == CellMarker.Cross)
         {
-            CellMarker.Cross => "X",
-            CellMarker.Nought => "O",
-            _ => " "
-        })
+           <CellCross />
+        }else if (Data.Value == CellMarker.Nought)
+        {
+            <CellNought />
+        }
+        else
+        {
+            @: 
+        }
     </span>
 </div>
 
@@ -50,7 +54,7 @@
 
   [Parameter]
   public EventCallback<Coordinates> OnCellSelected {get; set;}
-
+    
   private void CellSelected(){
       OnCellSelected.InvokeAsync(Data.Coordinates);
   }

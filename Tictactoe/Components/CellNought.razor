@@ -1,0 +1,75 @@
+@using Tictactoe.Core;
+
+<style>
+    /* draw circle styles */
+    
+    .circle-wrapper{
+      width: 40px;
+      height: 40px;
+      position:relative;
+      background: transparent; 
+    }
+    
+     .circle-wrapper, .circle-wrapper * {
+      -moz-box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+    
+    .circle{
+      transform-origin: 100% 50%;
+      width: 50%;
+      height: 100%;
+      position: absolute;
+      background: transparent;
+      border: 5px solid white;
+    }
+    
+    .spinner{
+      border-radius: 20px 0 0 20px;
+      z-index: 200;
+      border-right: none;
+      animation: rota 1s linear forwards;
+    }
+    
+    .filler{
+      border-radius: 0 20px 20px 0;
+      z-index: 100;
+      left: 50%;
+      border-left: none;
+      opacity: 0;
+      animation: fill 1s steps(1, end) forwards;
+    }
+    
+    .mask{
+      width: 50%;
+      height: 100%;
+      background: darkslateblue;
+      position: absolute;
+      opacity: 1;
+      z-index: 300;
+      animation: mask 1s steps(1, end) forwards;
+    }
+    
+    @@keyframes rota {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @@keyframes fill {
+      0%        { opacity: 0; }
+      50%, 100% { opacity: 1; }
+    }
+    
+    @@keyframes mask{
+      0% {opacity: 1;}
+      50%, 100%{opacity: 0;}
+    }
+    
+</style>
+
+<div class="circle-wrapper">
+  <div class="spinner circle"></div>
+  <div class="filler circle"></div>
+  <div class="mask"></div>
+</div>

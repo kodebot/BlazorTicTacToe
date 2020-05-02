@@ -13,9 +13,13 @@ namespace Tictactoe.Core.Player
         
         public override async Task<Coordinates> GetNextMove(Board<CellMarker> board)
         {
-            await Task.Delay(2000);
+            
+            // todo: play next move to create two winning possibilities
+            
+            
+            await Task.Delay(1000);
             // find random empty cell
-
+            
             var (canWin, winningCoordinates) = CanWinInNextMove(board, Marker);
             if (canWin)
             {
