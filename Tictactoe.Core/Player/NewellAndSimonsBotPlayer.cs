@@ -56,7 +56,7 @@ namespace Tictactoe.Core.Player
             if (canFork)
             {
                 Console.WriteLine("can fork");
-                return forkCoordinates;
+                return forkCoordinates[0];
             }
 
             var (canOpponentFork, opponentForkCoordinates) = CanFork(board, opponentPlayerMarker);
@@ -64,7 +64,16 @@ namespace Tictactoe.Core.Player
             if (canOpponentFork)
             {
                 Console.WriteLine("block fork");
-                return opponentForkCoordinates;
+                var (canCreateWinningOptionToBlock, coordinates) = CanCreateWinningOption(board, Marker);
+                if (canCreateWinningOptionToBlock)
+                {
+
+                    return coordinates;
+                }
+                else
+                {
+                    return opponentForkCoordinates[0];
+                }
             }
 
             // Center
@@ -111,13 +120,13 @@ namespace Tictactoe.Core.Player
 
             // Empty Side
             var midCellIndex = (int)Math.Floor(board.GridSize / 2.0);
-            if(board.Rows[0].All(cell => cell.Value == CellMarker.Empty))
+            if (board.Rows[0].All(cell => cell.Value == CellMarker.Empty))
             {
                 Console.WriteLine("empty side");
                 return board.Rows[0][midCellIndex].Coordinates;
             }
 
-            if(board.Columns[2].All(cell => cell.Value == CellMarker.Empty))
+            if (board.Columns[2].All(cell => cell.Value == CellMarker.Empty))
             {
                 Console.WriteLine("empty side");
                 return board.Columns[2][midCellIndex].Coordinates;
@@ -185,7 +194,7 @@ namespace Tictactoe.Core.Player
             }
         }
 
-        private (bool, Coordinates) CanFork(Board<CellMarker> board, CellMarker marker)
+        private (bool, List<Coordinates>) CanFork(Board<CellMarker> board, CellMarker marker)
         {
             var forkOptions = new List<(int, Coordinates)>();
 
@@ -212,7 +221,7 @@ namespace Tictactoe.Core.Player
 
             if (forkOptions.Any())
             {
-                return (true, forkOptions.Where(x => x.Item1 == forkOptions.Max(item => item.Item1)).First().Item2);
+                return (true, forkOptions.Select(x => x.Item2).Distinct().ToList());
             }
 
             return (false, default);
@@ -242,5 +251,50 @@ namespace Tictactoe.Core.Player
             };
         }
 
+
+
+        private (bool, Coordinates) CanCreateWinningOption(Board<CellMarker> board, CellMarker marker)
+        {
+            foreach (var row in board.Rows)
+            {
+                if (IsWinningPositionPossible(row))
+                {
+                    return (true, row.First(cell => cell.Value == CellMarker.Empty).Coordinates);
+                }
+            }
+
+            foreach (var column in board.Columns)
+            {
+                if (IsWinningPositionPossible(column))
+                {
+                    return (true, column.First(cell => cell.Value == CellMarker.Empty).Coordinates);
+                }
+            }
+
+            if (IsWinningPositionPossible(board.LeftToRightDiagonal))
+            {
+                return (true, GetNextMoveCoordinates(board.LeftToRightDiagonal));
+            }
+
+            if (IsWinningPositionPossible(board.RightToLeftDiagonal))
+            {
+                return (true, GetNextMoveCoordinates(board.RightToLeftDiagonal));
+            }
+
+            return (false, default);
+
+            bool IsWinningPositionPossible(Cell<CellMarker>[] cells)
+            {
+                return cells.Count(cell => cell.Value == CellMarker.Empty) == 2 &&
+                       cells.Any(cell => cell.Value == marker);
+            }
+
+            Coordinates GetNextMoveCoordinates(Cell<CellMarker>[] cells)
+            {
+                var random = new Random();
+                var index = random.Next(0, 2);
+                return cells.Where(cell => cell.Value == CellMarker.Empty).ElementAt(index).Coordinates;
+            }
+        }
     }
 }
