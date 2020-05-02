@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Tictactoe.Core
 {
@@ -15,6 +16,19 @@ namespace Tictactoe.Core
             InitCells();
         }
 
+        public Board<T> Clone()
+        {
+            var cloned = new Board<T>(this._gridSize);
+            for (var row = 0; row < this._gridSize; row++)
+            {
+                for (var col = 0; col < this._gridSize; col++)
+                {
+                    cloned.Fill(new Coordinates(row, col), this[row, col]);
+                }
+            }
+            return cloned;
+        }
+
         public T this[int row, int col] => _cells[row][col].Value;
 
         public int GridSize => _gridSize;
@@ -27,7 +41,7 @@ namespace Tictactoe.Core
         {
             get
             {
-                var result = new Cell<T>[3];
+                var result = new Cell<T>[_gridSize];
                 for (var rowIndex = 0; rowIndex < _gridSize; rowIndex++)
                 {
                     result[rowIndex] = _cells[rowIndex][rowIndex];
@@ -40,12 +54,27 @@ namespace Tictactoe.Core
         {
             get
             {
-                var result = new Cell<T>[3];
+                var result = new Cell<T>[_gridSize];
                 for (var rowIndex = 0; rowIndex < _gridSize; rowIndex++)
                 {
                     result[rowIndex] = _cells[rowIndex][(_gridSize - 1) - rowIndex];
                 }
                 return result;
+            }
+        }
+
+        public Cell<T>[] Corners
+        {
+            get
+            {
+                var result = new List<Cell<T>>();
+
+                result.Add(Rows[0][0]);
+                result.Add(Rows[0][GridSize - 1]);
+                result.Add(Rows[GridSize - 1][GridSize - 1]);
+                result.Add(Rows[GridSize - 1][0]);
+
+                return result.ToArray();
             }
         }
 
