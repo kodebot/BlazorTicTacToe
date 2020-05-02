@@ -101,6 +101,7 @@
         {
             ComputerPlayerMode.Easy => new RandomBotPlayer(marker) as Player<CellMarker>,
             ComputerPlayerMode.Medium => new SmartBotPlayer(marker),
+            ComputerPlayerMode.Hard => new NewellAndSimonsBotPlayer(marker),
             _ => throw new NotSupportedException($"Player mode {playerMode} is not supported")
         };
     }

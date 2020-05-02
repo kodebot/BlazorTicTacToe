@@ -10,9 +10,10 @@ namespace Tictactoe.Core.Player
         public NewellAndSimonsBotPlayer(CellMarker marker) : base(marker)
         {
         }
-        
+
         public override async Task<Coordinates> GetNextMove(Board<CellMarker> board)
         {
+            await Task.Delay(1000);
             /*
             A player can play a perfect game of tic-tac-toe (to win or at least, draw) if each time it is their turn to play, they choose the first available move from the following list, as used in Newell and Simon's 1972 tic-tac-toe program.[16]
 
@@ -33,12 +34,12 @@ namespace Tictactoe.Core.Player
             Empty side: The player plays in a middle square on any of the 4 sides.
              */
 
-            await Task.Delay(1000);
-                        
+
             var (canWin, winningCoordinates) = CanWinInNextMove(board, Marker);
             if (canWin)
             {
-                return winningCoordinates;
+                Console.WriteLine("Can Win");
+                return winningCoordinates[0];
             }
 
             var opponentPlayerMarker = GetOpponentMarker();
@@ -46,103 +47,175 @@ namespace Tictactoe.Core.Player
 
             if (canOpponentWin)
             {
-                return blockingCoordinates;
+                Console.WriteLine("Block");
+                return blockingCoordinates[0];
             }
 
-            var (canCreateWinningBoard, winningBoardCoordinates) = CanCreateWinningOption(board, Marker);
+            var (canFork, forkCoordinates) = CanFork(board, Marker);
 
-            if (canCreateWinningBoard)
+            if (canFork)
             {
-                return winningBoardCoordinates;
+                Console.WriteLine("can fork");
+                return forkCoordinates;
             }
 
+            var (canOpponentFork, opponentForkCoordinates) = CanFork(board, opponentPlayerMarker);
+
+            if (canOpponentFork)
+            {
+                Console.WriteLine("block fork");
+                return opponentForkCoordinates;
+            }
+
+            // Center
+            var row = (int)Math.Floor(board.GridSize / 2.0);
+            var col = row;
+            Console.WriteLine($"center {row} {col}");
+            if (board.Rows[row][col].Value == CellMarker.Empty)
+            {
+                Console.WriteLine("center");
+                return board.Rows[row][col].Coordinates; // center
+            }
+
+            // Opposite Corner
+            if (board.Corners[0].Value == opponentPlayerMarker && board.Corners[2].Value == CellMarker.Empty)
+            {
+                Console.WriteLine("opposite corner");
+                return board.Corners[2].Coordinates;
+            }
+
+            if (board.Corners[1].Value == opponentPlayerMarker && board.Corners[3].Value == CellMarker.Empty)
+            {
+                Console.WriteLine("opposite corner");
+                return board.Corners[3].Coordinates;
+            }
+
+            if (board.Corners[2].Value == opponentPlayerMarker && board.Corners[0].Value == CellMarker.Empty)
+            {
+                Console.WriteLine("opposite corner");
+                return board.Corners[0].Coordinates;
+            }
+
+            if (board.Corners[3].Value == opponentPlayerMarker && board.Corners[1].Value == CellMarker.Empty)
+            {
+                Console.WriteLine("opposite corner");
+                return board.Corners[1].Coordinates;
+            }
+
+            // Empty Corner
+            if (board.Corners.Any(corner => corner.Value == CellMarker.Empty))
+            {
+                Console.WriteLine("empty corner");
+                return board.Corners.First(corner => corner.Value == CellMarker.Empty).Coordinates;
+            }
+
+            // Empty Side
+            var midCellIndex = (int)Math.Floor(board.GridSize / 2.0);
+            if(board.Rows[0].All(cell => cell.Value == CellMarker.Empty))
+            {
+                Console.WriteLine("empty side");
+                return board.Rows[0][midCellIndex].Coordinates;
+            }
+
+            if(board.Columns[2].All(cell => cell.Value == CellMarker.Empty))
+            {
+                Console.WriteLine("empty side");
+                return board.Columns[2][midCellIndex].Coordinates;
+            }
+
+            if (board.Rows[2].All(cell => cell.Value == CellMarker.Empty))
+            {
+                Console.WriteLine("empty side");
+                return board.Rows[2][midCellIndex].Coordinates;
+            }
+
+            if (board.Columns[0].All(cell => cell.Value == CellMarker.Empty))
+            {
+                Console.WriteLine("empty side");
+                return board.Columns[0][midCellIndex].Coordinates;
+            }
+
+            Console.WriteLine("random");
             return GetRandomCoordinates(board);
         }
 
-        private (bool, Coordinates) CanWinInNextMove(Board<CellMarker> board, CellMarker marker)
+        private (bool, Coordinates[]) CanWinInNextMove(Board<CellMarker> board, CellMarker marker)
         {
+            var winningCoordinates = new List<Coordinates>();
+
             foreach (var row in board.Rows)
             {
                 if (IsInWinningPosition(row))
                 {
-                    return (true, row.First(cell => cell.Value == CellMarker.Empty).Coordinates);
+                    winningCoordinates.Add(row.First(cell => cell.Value == CellMarker.Empty).Coordinates);
                 }
             }
-            
+
             foreach (var column in board.Columns)
             {
                 if (IsInWinningPosition(column))
                 {
-                    return (true, column.First(cell => cell.Value == CellMarker.Empty).Coordinates);
+                    winningCoordinates.Add(column.First(cell => cell.Value == CellMarker.Empty).Coordinates);
                 }
             }
 
             if (IsInWinningPosition(board.LeftToRightDiagonal))
             {
-                return (true, GetNextMoveCoordinates(board.LeftToRightDiagonal));
+                winningCoordinates.Add(GetNextMoveCoordinates(board.LeftToRightDiagonal));
             }
-            
+
             if (IsInWinningPosition(board.RightToLeftDiagonal))
             {
-                return (true, GetNextMoveCoordinates(board.RightToLeftDiagonal));
+                winningCoordinates.Add(GetNextMoveCoordinates(board.RightToLeftDiagonal));
             }
-            
-            return (false, default);
+
+            winningCoordinates.Distinct();
+
+            return (winningCoordinates.Any(), winningCoordinates.ToArray());
 
             bool IsInWinningPosition(Cell<CellMarker>[] cells)
             {
-                return cells.Count(cell => cell.Value ==  marker) == 2 &&
-                       cells.Any(cell => cell.Value  == CellMarker.Empty);
+                return cells.Count(cell => cell.Value == marker) == 2 &&
+                       cells.Any(cell => cell.Value == CellMarker.Empty);
             }
 
             Coordinates GetNextMoveCoordinates(Cell<CellMarker>[] cells)
             {
-                return cells.First(cell => cell.Value ==  CellMarker.Empty).Coordinates;
+                return cells.First(cell => cell.Value == CellMarker.Empty).Coordinates;
             }
         }
 
-        private (bool, Coordinates) CanCreateWinningOption(Board<CellMarker> board, CellMarker marker)
+        private (bool, Coordinates) CanFork(Board<CellMarker> board, CellMarker marker)
         {
-            foreach (var row in board.Rows)
+            var forkOptions = new List<(int, Coordinates)>();
+
+            var clonedBoard = board.Clone();
+
+            for (var row = 0; row < clonedBoard.GridSize; row++)
             {
-                if (IsWinningPositionPossible(row))
+                for (var col = 0; col < clonedBoard.GridSize; col++)
                 {
-                    return (true, row.First(cell => cell.Value == CellMarker.Empty).Coordinates);
-                }
-            }
-            
-            foreach (var column in board.Columns)
-            {
-                if (IsWinningPositionPossible(column))
-                {
-                    return (true, column.First(cell => cell.Value == CellMarker.Empty).Coordinates);
+                    var cell = clonedBoard.Rows[row][col];
+                    if (cell.Value == CellMarker.Empty)
+                    {
+                        // place the player marker in the empty cell and record the coordinate if it has more than one winning possibility
+                        clonedBoard.Fill(cell.Coordinates, marker);
+                        var (canWin, coordinates) = CanWinInNextMove(clonedBoard, marker);
+                        if (canWin && coordinates.Count() > 1)
+                        {
+                            forkOptions.Add((coordinates.Count(), cell.Coordinates));
+                        }
+                        clonedBoard.Fill(cell.Coordinates, CellMarker.Empty); // clear the cell to original
+                    }
                 }
             }
 
-            if (IsWinningPositionPossible(board.LeftToRightDiagonal))
+            if (forkOptions.Any())
             {
-                return (true, GetNextMoveCoordinates(board.LeftToRightDiagonal));
+                return (true, forkOptions.Where(x => x.Item1 == forkOptions.Max(item => item.Item1)).First().Item2);
             }
-            
-            if (IsWinningPositionPossible(board.RightToLeftDiagonal))
-            {
-                return (true, GetNextMoveCoordinates(board.RightToLeftDiagonal));
-            }
-            
+
             return (false, default);
-
-            bool IsWinningPositionPossible(Cell<CellMarker>[] cells)
-            {
-                return cells.Count(cell => cell.Value == CellMarker.Empty) == 2 &&
-                       cells.Any(cell => cell.Value  == marker);
-            }
-
-            Coordinates GetNextMoveCoordinates(Cell<CellMarker>[] cells)
-            {
-                var random = new Random();
-                var index = random.Next(0, 2);
-                return cells.Where(cell => cell.Value ==  CellMarker.Empty).ElementAt(index).Coordinates;
-            }
         }
 
         private Coordinates GetRandomCoordinates(Board<CellMarker> board)
@@ -168,6 +241,6 @@ namespace Tictactoe.Core.Player
                 _ => throw new InvalidOperationException("This is impossible!")
             };
         }
-        
+
     }
 }
