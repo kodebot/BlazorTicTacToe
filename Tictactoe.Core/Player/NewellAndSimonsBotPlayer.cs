@@ -67,8 +67,12 @@ namespace Tictactoe.Core.Player
                 var (canCreateWinningOptionToBlock, coordinates) = CanCreateWinningOption(board, Marker);
                 if (canCreateWinningOptionToBlock)
                 {
-
-                    return coordinates;
+                    // use one of the forkable coordiante to force the opponent to play diffenrent move
+                    var coordinatesToBlock = coordinates.Where(coordinate => opponentForkCoordinates.Contains(coordinate));
+                    if (coordinatesToBlock.Any())
+                    {
+                        return coordinatesToBlock.First();
+                    }
                 }
                 else
                 {
@@ -253,13 +257,15 @@ namespace Tictactoe.Core.Player
 
 
 
-        private (bool, Coordinates) CanCreateWinningOption(Board<CellMarker> board, CellMarker marker)
+        private (bool, Coordinates[]) CanCreateWinningOption(Board<CellMarker> board, CellMarker marker)
         {
+            var winningOptions = new List<Coordinates>();
+
             foreach (var row in board.Rows)
             {
                 if (IsWinningPositionPossible(row))
                 {
-                    return (true, row.First(cell => cell.Value == CellMarker.Empty).Coordinates);
+                    winningOptions.AddRange(row.Where(cell => cell.Value == CellMarker.Empty).Select(cell => cell.Coordinates));
                 }
             }
 
@@ -267,18 +273,23 @@ namespace Tictactoe.Core.Player
             {
                 if (IsWinningPositionPossible(column))
                 {
-                    return (true, column.First(cell => cell.Value == CellMarker.Empty).Coordinates);
+                    winningOptions.AddRange(column.Where(cell => cell.Value == CellMarker.Empty).Select(cell => cell.Coordinates));
                 }
             }
 
             if (IsWinningPositionPossible(board.LeftToRightDiagonal))
             {
-                return (true, GetNextMoveCoordinates(board.LeftToRightDiagonal));
+                winningOptions.AddRange(board.LeftToRightDiagonal.Where(cell => cell.Value == CellMarker.Empty).Select(cell => cell.Coordinates));
             }
 
             if (IsWinningPositionPossible(board.RightToLeftDiagonal))
             {
-                return (true, GetNextMoveCoordinates(board.RightToLeftDiagonal));
+                winningOptions.AddRange(board.RightToLeftDiagonal.Where(cell => cell.Value == CellMarker.Empty).Select(cell => cell.Coordinates));
+            }
+
+            if (winningOptions.Any())
+            {
+                return (true, winningOptions.ToArray());
             }
 
             return (false, default);
@@ -287,13 +298,6 @@ namespace Tictactoe.Core.Player
             {
                 return cells.Count(cell => cell.Value == CellMarker.Empty) == 2 &&
                        cells.Any(cell => cell.Value == marker);
-            }
-
-            Coordinates GetNextMoveCoordinates(Cell<CellMarker>[] cells)
-            {
-                var random = new Random();
-                var index = random.Next(0, 2);
-                return cells.Where(cell => cell.Value == CellMarker.Empty).ElementAt(index).Coordinates;
             }
         }
     }
